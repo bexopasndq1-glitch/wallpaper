@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>macOS Liquid Glass Wallpaper - Dynamic Edition</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #05050a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px; /* Глубокая перспектива для сильного 3D */
+        }
+
+        /* Обновленный динамичный жидкий фон */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            filter: blur(40px) contrast(1.6);
+            background: linear-gradient(135deg, #060814, #0f0c24);
+        }
+
+        /* Измененная форма капель — более жидкие и вытянутые */
+        .blob {
+            position: absolute;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            mix-blend-mode: screen;
+            animation: move 8s infinite alternate ease-in-out; /* Скорость увеличена в ~3 раза */
+        }
+
+        .blob:nth-child(1) {
+            width: 70vw;
+            height: 55vw;
+            top: -15%;
+            left: -10%;
+            background: linear-gradient(135deg, #ff2d55, #673ab7);
+            animation-duration: 9s;
+        }
+
+        .blob:nth-child(2) {
+            width: 55vw;
+            height: 65vw;
+            bottom: -15%;
+            right: -10%;
+            background: linear-gradient(135deg, #00d2ff, #00bf63);
+            animation-duration: 7s;
+            animation-delay: -2s;
+        }
+
+        .blob:nth-child(3) {
+            width: 50vw;
+            height: 50vw;
+            top: 25%;
+            left: 35%;
+            background: linear-gradient(135deg, #9c27b0, #ff5722);
+            animation-duration: 10s;
+            animation-delay: -4s;
+        }
+
+        @keyframes move {
+            0% { 
+                transform: translate(0, 0) scale(1) rotate(0deg); 
+                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            }
+            50% { 
+                transform: translate(15vw, 15vh) scale(1.2) rotate(120deg); 
+                border-radius: 50% 50% 30% 70% / 50% 60% 40% 50%;
+            }
+            100% { 
+                transform: translate(-8vw, -10vh) scale(0.8) rotate(240deg); 
+                border-radius: 60% 40% 60% 40% / 40% 50% 50% 60%;
+            }
+        }
+
+        /* Компактная тень от мыши */
+        .mouse-shadow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.75);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+            filter: blur(35px);
+            transform: translate(-50%, -50%);
+            transition: transform 0.05s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Контейнер БЕЗ ФОНА с усиленным 3D эффектом */
+        .glass-card {
+            position: relative;
+            z-index: 3;
+            padding: 2rem;
+            background: transparent; /* Убран фон */
+            border: none; /* Убраны границы */
+            box-shadow: none; /* Убрана тень коробки */
+            text-align: center;
+            user-select: none;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out; /* Плавный возврат */
+        }
+
+        /* Эффект Liquid Glass для ТЕКСТА */
+        .time, .date {
+            background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(240,240,250,0.65) 50%, rgba(255,255,255,0.15) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            /* Эффект жидкого стекла на буквах */
+            filter: drop-shadow(0px 3px 4px rgba(0, 0, 0, 0.5)) 
+                    drop-shadow(0px 12px 25px rgba(0,0,0,0.3));
+            position: relative;
+            transform: translateZ(50px); /* Выталкиваем текст вперед для параллакса */
+        }
+
+        /* Верхний стеклянный блик на цифрах */
+        .time::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 4;
+            background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 55%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.95;
+        }
+
+        .time {
+            font-size: 7.5rem;
+            font-weight: 800;
+            letter-spacing: -3px;
+            line-height: 1;
+        }
+
+        .date {
+            font-size: 1.35rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 25px;
+            opacity: 0.95;
+            transform: translateZ(30px); /* Меньший вылет вперед для глубины */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Задний анимированный фон -->
+    <div class="background">
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+    </div>
+
+    <!-- Тень от курсора -->
+    <div class="mouse-shadow" id="shadow"></div>
+
+    <!-- Виджет часов -->
+    <div class="glass-card" id="card">
+        <div class="time" id="clock" data-text="00:00">00:00</div>
+        <div class="date" id="date">Понедельник, 1 января</div>
+    </div>
+
+    <script>
+        const shadow = document.getElementById('shadow');
+        const card = document.getElementById('card');
+        const clock = document.getElementById('clock');
+        const dateEl = document.getElementById('date');
+
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // Движение тени
+            shadow.style.left = `${x}px`;
+            shadow.style.top = `${y}px`;
+
+            // Усиленный 3D наклон (множитель увеличен до 25)
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            const rotateX = ((y - windowHeight / 2) / windowHeight) * 25; // Увеличен прогиб
+            const rotateY = -((x - windowWidth / 2) / windowWidth) * 25;
+
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        // Плавный возврат в центр
+        document.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+
+        function updateClock() {
+            const now = new Date();
+            
+            let hours = String(now.getHours()).padStart(2, '0');
+            let minutes = String(now.getMinutes()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}`;
+            
+            clock.textContent = timeString;
+            clock.setAttribute('data-text', timeString);
+            
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            let dateString = now.toLocaleDateString('ru-RU', options);
+            dateString = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+            
+            dateEl.textContent = dateString;
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>
